@@ -8,8 +8,9 @@ program
   .description('Convert CSV files to WebVTT format.')
   .requiredOption('-i, --input <file>', 'input CSV file')
   .requiredOption('-o, --output <file>', 'output VTT file')
+  .option('--timeshift <time>', 'Specifies the time to shift (+HH:mm:ss.SSS or -HH:mm:ss.SSS)')
   .action(async (options) => {
-    const csv2webvtt = new Csv2Webvtt(options.input, options.output);
+    const csv2webvtt = new Csv2Webvtt(options.input, options.output, options.timeshift);
     await csv2webvtt.convert();
   });
 

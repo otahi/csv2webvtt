@@ -42,6 +42,7 @@ npm run start -- --input ./input.csv --output ./out.vtt
 
 - `--input`: Specifies the path to the input CSV file.
 - `--output`: Specifies the path where the output WebVTT file should be saved.
+- `--timeshift`: Specifies the time to shift(+HH:mm:ss.SSS or -HH:mm:ss.SSS, ex: 2:12:10.123 or -12:1.245)
 
 ## Example
 
