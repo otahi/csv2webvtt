@@ -88,4 +88,3 @@ Contributions to improve the CSV to WebVTT Converter are welcome. Please follow 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details.
-```
