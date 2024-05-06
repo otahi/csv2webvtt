@@ -2,7 +2,8 @@ import { parse } from 'csv-parse';
 import moment from 'moment';
 import * as fs from 'fs';
 
-type Cue = { speaker:string|null, start:string|null, end:string|null, text:string|null };
+type Cue = { speaker:string|null, start:moment.Moment|null, end:moment.Moment|null, text:string|null };
+const timeFormat = "HH:mm:ss.SSS";
 
 export class Csv2Webvtt {
   private inputCsv:string;
@@ -41,7 +42,7 @@ export class Csv2Webvtt {
   }
 
   public async convert() {
-    this.writeStream.write('Webvtt\n');
+    this.writeStream.write('WEBVTT\n\n');
     let isFirstLine = true;
 
     let cue:Cue = { speaker: null, start: null, end: null, text: null };
@@ -58,16 +59,16 @@ export class Csv2Webvtt {
         // time_from_start,date,time,speaker,bookmark flag, text
         nextCue = { speaker: null, start: null, end: null, text: null };
 
-        // webvtt
+        // WEBVTT
+        //
         // 00:00:01.000 --> 00:00:05.330
-        // <v Joe>My name is Joe</v>
+        // <v Joe>My name is Joe
 
-        nextCue.start = data[0];   // time_from_start
+        nextCue.start = moment(data[0], timeFormat);   // time_from_start
         nextCue.speaker = data[3]; // speaker
         nextCue.text = data[5];    // text
 
         if (nextCue.start) {
-          const timeFormat = "HH:mm:ss.SSS";
           let time = moment(nextCue.start, timeFormat);
           if (this.timeshift.isSet) {
             const timeshift = this.timeshift;
@@ -78,9 +79,13 @@ export class Csv2Webvtt {
             }
           }
 
-          nextCue.start = time.format("HH:mm:ss.SSS");
-
+          nextCue.start = time;
           cue.end = nextCue.start;
+
+          if (cue.start?.isSame(nextCue.start) || cue.start?.isAfter(cue.end)) {
+            nextCue.text = `${cue.text}${nextCue.text}`;
+            cue.text = null;
+          }
         }
 
         if (nextCue.text) {
@@ -88,12 +93,12 @@ export class Csv2Webvtt {
         }
 
         if (cue.text) {
-          this.writeStream.write(`${cue.start} --> ${cue.end}\n<v ${cue.speaker}>${cue.text}</v>\n`);
+          this.writeStream.write(`${cue.start?.format(timeFormat)} --> ${cue.end?.format(timeFormat)}\n<v ${cue.speaker}>${cue.text}\n\n`);
         }
 
         cue = nextCue;
       }).on('finish', () => {
-        this.writeStream.write(`${nextCue.start} --> ${nextCue.start}\n<v ${nextCue.speaker}>${nextCue.text}</v>\n`);
+        this.writeStream.write(`${nextCue.start?.format(timeFormat)} --> ${nextCue.start?.add({seconds: 0.01}).format(timeFormat)}\n<v ${nextCue.speaker}>${nextCue.text}\n\n`);
       }),
     );
   }
