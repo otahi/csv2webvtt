@@ -67,11 +67,11 @@ WEBVTT
 
 1
 00:00:00.000 --> 00:00:10.000
-<v Hiroshi>Welcome to our presentation.</v>
+<v Hiroshi>Welcome to our presentation.
 
 2
 00:00:10.000 --> 00:00:20.000
-<v Hiroshi>Thank you for joining us today.</v>
+<v Hiroshi>Thank you for joining us today.
 ```
 
 ## Contributing
